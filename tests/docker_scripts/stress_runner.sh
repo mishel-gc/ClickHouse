@@ -354,6 +354,13 @@ fi
 # hang the server under sanitizers and trip the hung check.
 cp -av --dereference /repo/ci/jobs/scripts/fuzzer/limit-recursion-settings.xml /etc/clickhouse-server/users.d/
 
+# Randomize Keeper fault injection for `S3Queue`. It is read from the settings of the global context,
+# which take the default profile only at startup, so it cannot be a query or a reloaded setting.
+if [ $((RANDOM % 2)) -eq 0 ]; then
+    sudo echo "<clickhouse><profiles><default><s3queue_keeper_fault_injection_probability>0.01</s3queue_keeper_fault_injection_probability></default></profiles></clickhouse>" \
+        > /etc/clickhouse-server/users.d/s3queue_keeper_fault_injection.xml
+fi
+
 start_server || { echo "Failed to start server"; exit 1; }
 
 # clickhouse-test must know which storage backend the server actually uses, or its storage skip

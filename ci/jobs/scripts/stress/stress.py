@@ -772,6 +772,13 @@ def get_options(i: int, upgrade_check: bool, encrypted_storage: bool) -> str:
         )
 
     if random.random() < 0.2:
+        # Sleep before each `MergeTree` storage snapshot, widening the window in which the
+        # concurrent merges, mutations and `ALTER`s change the parts under the query.
+        client_options.append(
+            f"merge_tree_storage_snapshot_sleep_ms={random.choice([1, 5, 20])}"
+        )
+
+    if random.random() < 0.2:
         # Dependent materialized views are written in parallel instead of sequentially.
         client_options.append("parallel_view_processing=1")
 
