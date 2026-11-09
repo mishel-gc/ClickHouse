@@ -27,10 +27,6 @@ MUTATION_DELAY_FAILPOINT = "mutate_task_random_sleep_in_prepare"
 # drops whatever is still queued and exports nothing for the rest of the run.
 KEEP_DATABASES = ("system", "ci_logs_export")
 
-# Listeners the random disruptor stops for a while, as `SYSTEM STOP LISTEN <name>`. Not `TCP` and
-# `HTTP`: `clickhouse-test`, this script and the hung check use them.
-DISRUPTED_LISTENERS = ("TCP SECURE", "HTTPS", "MYSQL", "POSTGRESQL", "GRPC", "ARROW FLIGHT", "TCP SSH")
-
 # GNU `tar` exit statuses: 0 - success, 1 - some files differ (a file changed
 # or shrank while it was being read), 2 and above - a fatal error.
 TAR_EXIT_DIFFERS = 1
@@ -132,7 +128,6 @@ class RandomDisruptor:
         ("STOP REPLICATION QUEUES", "START REPLICATION QUEUES"),
         ("STOP CLEANUP", "START CLEANUP"),
         ("STOP PULLING REPLICATION LOG", "START PULLING REPLICATION LOG"),
-        *((f"STOP LISTEN {listener}", f"START LISTEN {listener}") for listener in DISRUPTED_LISTENERS),
     )
     # Server-wide statements the one-shot branch runs: a lost Keeper session, objects that the
     # running queries use going away and loading again, and memory returned to the system.
@@ -1166,8 +1161,6 @@ def prepare_for_hung_check(drop_databases: bool) -> bool:
     # Stopped only by the random disruptor.
     call_with_retry(make_query_command("SYSTEM START CLEANUP"))
     call_with_retry(make_query_command("SYSTEM START PULLING REPLICATION LOG"))
-    for listener in DISRUPTED_LISTENERS:
-        call_with_retry(make_query_command(f"SYSTEM START LISTEN {listener}"))
     call_with_retry(make_query_command("SYSTEM DROP MARK CACHE"))
 
     # Kill other queries which known to be slow
