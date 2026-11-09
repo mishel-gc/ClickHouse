@@ -6,6 +6,7 @@
 #include <Common/logger_useful.h>
 #include <Disks/DiskFromAST.h>
 #include <Disks/DiskObjectStorage/DiskObjectStorage.h>
+#include <Disks/StoragePolicy.h>
 #include <Interpreters/Context.h>
 #include <Parsers/FieldFromAST.h>
 #include <Parsers/isDiskFunction.h>
@@ -38,6 +39,18 @@ static void validateTableDisk(const DiskPtr & disk)
             description.toString());
 }
 
+static void ensureStoragePolicyHasNoCustomDisks(const String & policy_name, ContextPtr context)
+{
+    for (const auto & disk : context->getStoragePolicy(policy_name)->getDisks())
+        if (disk->isCustomDisk())
+            throw Exception(
+                ErrorCodes::BAD_ARGUMENTS,
+                "Storage policy `{}` contains the custom disk `{}` of another table. "
+                "That disk could not be used by a reference by other tables. The custom disk should be fully specified with a disk function.",
+                policy_name,
+                disk->getName());
+}
+
 bool checkMergeTreeDiskSettings(const SettingsChanges & changes, ContextPtr context, bool is_loading_from_existing_metadata)
 {
     bool found_disk_setting = false;
@@ -53,7 +66,11 @@ bool checkMergeTreeDiskSettings(const SettingsChanges & changes, ContextPtr cont
             found_disk_setting = true;
         }
         else if (name == "storage_policy")
+        {
             found_storage_policy_setting = true;
+            if (!is_loading_from_existing_metadata)
+                ensureStoragePolicyHasNoCustomDisks(value.safeGet<String>(), context);
+        }
         else if (name == "table_disk")
             table_disk = value.safeGet<bool>();
 

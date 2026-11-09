@@ -509,6 +509,12 @@ def test_sql_hdfs_disk_remote_host_filter(cluster):
         # A new wrapper takes the old custom disk by name, without building an HDFS object storage.
         for wrapper in wrapper_disks:
             assert_rejected(wrapper)
+        # The policy of a custom disk names that disk, so it is rejected like the disk name itself.
+        error = node.query_and_get_error(
+            "CREATE TABLE t_rejected_hdfs_disk (x UInt32) ENGINE = MergeTree ORDER BY x "
+            "SETTINGS storage_policy = '__old_hdfs'"
+        )
+        assert "contains the custom disk `old_hdfs`" in error, error
 
     # Created before the list excludes hdfs1: loaded from metadata on restart, so they are only reported.
     create("t_existing_hdfs_disk", existing_disk)
