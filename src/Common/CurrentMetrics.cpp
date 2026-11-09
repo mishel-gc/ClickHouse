@@ -343,6 +343,7 @@
     M(AttachedDatabase, "Active databases.") \
     M(AttachedTable, "Active tables.") \
     M(AttachedReplicatedTable, "Active replicated tables.") \
+    M(AttachedSharedTable, "Active SharedMergeTree tables.") \
     M(AttachedView, "Active views.") \
     M(AttachedDictionary, "Active dictionaries.") \
     M(PartsOutdated, "Not active data part, but could be used by only current SELECTs, could be deleted after SELECTs finishes.") \
@@ -501,6 +502,7 @@
     M(SharedMergeTreeMinReplicas, "The minimum number of replicas registered in Keeper across all tables. Note it might not be a sum of SharedMergeTreeMinActiveReplicas and SharedMergeTreeMinInactiveReplicas") \
     M(SharedMergeTreeMinPartitions, "The minimum number of partitions registered in Keeper across all SharedMergeTree tables") \
     M(SharedMergeTreeMaxPartitions, "The maximum number of partitions registered in Keeper across all SharedMergeTree tables") \
+    M(SharedMergeTreePartsUpdateLeaderLocksHeld, "Parts update leader locks held or being acquired by this replica, one per SharedMergeTree table where it is the leader") \
     M(CacheWarmerBytesInProgress, "Total size of remote file segments waiting to be asynchronously loaded into filesystem cache.") \
     M(DistrCacheOpenedConnections, "Number of open connections to Distributed Cache") \
     M(DistrCacheSharedLimitCount, "Number of opened connections according to DistributedCache::ConnectionPool::SharedLimit") \
@@ -530,6 +532,9 @@
     \
     M(DiskConnectionsStored, "Total count of sessions stored in the session pool for disks") \
     M(DiskConnectionsTotal, "Total count of all sessions: stored in the pool and actively used right now for disks") \
+    \
+    M(AmberConnectionsStored, "Total count of sessions stored in the session pool for Amber") \
+    M(AmberConnectionsTotal, "Total count of all sessions: stored in the pool and actively used right now for Amber") \
     \
     M(BlobKillerThreads, "Number of threads in the thread pool of the object storage disk background removal process") \
     M(BlobKillerThreadsActive, "Number of threads in the thread pool of the object storage disk background removal process running a task") \

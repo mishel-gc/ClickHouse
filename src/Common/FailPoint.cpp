@@ -76,6 +76,7 @@ static struct InitFiu
     PAUSEABLE_ONCE(smt_commit_tweaks_gate_open) \
     PAUSEABLE_ONCE(smt_commit_tweaks_gate_close) \
     PAUSEABLE_ONCE(smt_get_status_pause_before_keeper_read) \
+    PAUSEABLE_ONCE(smt_parts_killer_pause_before_staging_part_removal) \
     ONCE(smt_commit_merge_change_version_before_op) \
     ONCE(smt_merge_mutate_intention_freeze_in_destructor) \
     ONCE(smt_detach_part_replica_set_change_before_commit) \
@@ -134,6 +135,7 @@ static struct InitFiu
     ONCE(distributed_cache_server_fail_metrics_request) \
     ONCE(distributed_cache_server_fail_show_request) \
     ONCE(distributed_cache_server_fail_show_streaming) \
+    ONCE(distributed_cache_fail_show_row_insert) \
     ONCE(distributed_cache_server_reply_slow_down) \
     REGULAR(distributed_cache_fail_request_in_the_middle_of_request_always) \
     REGULAR(distributed_cache_assume_gap_buffered_on_seek) \
